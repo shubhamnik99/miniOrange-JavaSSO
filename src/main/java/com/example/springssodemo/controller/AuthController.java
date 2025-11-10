@@ -1,7 +1,9 @@
+// ==================== AuthController.java (Updated) ====================
 package com.example.springssodemo.controller;
 
 import com.example.springssodemo.model.User;
 import com.example.springssodemo.repo.UserRepository;
+import com.example.springssodemo.service.SSOConfigService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,20 +15,29 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final SSOConfigService ssoConfigService;
 
-    public AuthController(UserRepository userRepository) {
+    public AuthController(UserRepository userRepository, SSOConfigService ssoConfigService) {
         this.userRepository = userRepository;
+        this.ssoConfigService = ssoConfigService;
     }
 
     // ------------------ LOGIN PAGE ------------------
     @GetMapping({"/", "/login"})
-    public String loginPage() {
+    public String loginPage(Model model) {
+        // Get enabled SSO methods and pass to login page
+        Map<String, Boolean> enabledSSO = ssoConfigService.getEnabledSSOMethods();
+        model.addAttribute("jwtEnabled", enabledSSO.get("jwt"));
+        model.addAttribute("samlEnabled", enabledSSO.get("saml"));
+        model.addAttribute("oauthEnabled", enabledSSO.get("oauth"));
+        
         return "login";
     }
 
@@ -60,6 +71,13 @@ public class AuthController {
         userRepository.save(newUser);
 
         model.addAttribute("message", "Registered successfully! Please login.");
+        
+        // Pass SSO status for login page
+        Map<String, Boolean> enabledSSO = ssoConfigService.getEnabledSSOMethods();
+        model.addAttribute("jwtEnabled", enabledSSO.get("jwt"));
+        model.addAttribute("samlEnabled", enabledSSO.get("saml"));
+        model.addAttribute("oauthEnabled", enabledSSO.get("oauth"));
+        
         return "login";
     }
 
@@ -94,7 +112,7 @@ public class AuthController {
                         );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                // ✅ Redirect based on role
+                // Redirect based on role
                 if ("ADMIN".equalsIgnoreCase(user.getRole())) {
                     return "redirect:/admin-dashboard";
                 } else {
@@ -103,10 +121,24 @@ public class AuthController {
 
             } else {
                 model.addAttribute("error", "Invalid password");
+                
+                // Pass SSO status
+                Map<String, Boolean> enabledSSO = ssoConfigService.getEnabledSSOMethods();
+                model.addAttribute("jwtEnabled", enabledSSO.get("jwt"));
+                model.addAttribute("samlEnabled", enabledSSO.get("saml"));
+                model.addAttribute("oauthEnabled", enabledSSO.get("oauth"));
+                
                 return "login";
             }
         } else {
             model.addAttribute("error", "User not found");
+            
+            // Pass SSO status
+            Map<String, Boolean> enabledSSO = ssoConfigService.getEnabledSSOMethods();
+            model.addAttribute("jwtEnabled", enabledSSO.get("jwt"));
+            model.addAttribute("samlEnabled", enabledSSO.get("saml"));
+            model.addAttribute("oauthEnabled", enabledSSO.get("oauth"));
+            
             return "login";
         }
     }

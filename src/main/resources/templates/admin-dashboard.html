@@ -391,6 +391,12 @@
         0 0 60px rgba(138, 43, 226, 0.3);
       border: 1px solid rgba(138, 43, 226, 0.3);
       animation: slideUp 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-content.large {
+      max-width: 800px;
     }
 
     @keyframes slideUp {
@@ -448,7 +454,8 @@
     }
 
     .form-group input,
-    .form-group select {
+    .form-group select,
+    .form-group textarea {
       width: 100%;
       padding: 12px 16px;
       border-radius: 10px;
@@ -458,10 +465,18 @@
       font-size: 1em;
       outline: none;
       transition: all 0.3s ease;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+      font-family: 'Courier New', monospace;
     }
 
     .form-group input:focus,
-    .form-group select:focus {
+    .form-group select:focus,
+    .form-group textarea:focus {
       border-color: #8a2be2;
       background-color: rgba(43, 43, 43, 0.8);
       box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
@@ -521,6 +536,120 @@
       }
     }
 
+    /* SSO Configuration Styles */
+    .sso-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      border-bottom: 2px solid rgba(138, 43, 226, 0.2);
+    }
+
+    .sso-tab {
+      padding: 12px 24px;
+      background: rgba(138, 43, 226, 0.1);
+      border: none;
+      color: #999;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1em;
+      transition: all 0.3s ease;
+      border-radius: 10px 10px 0 0;
+      border: 2px solid transparent;
+      border-bottom: none;
+    }
+
+    .sso-tab:hover {
+      background: rgba(138, 43, 226, 0.15);
+      color: #00bfff;
+    }
+
+    .sso-tab.active {
+      background: rgba(0, 191, 255, 0.2);
+      color: #00bfff;
+      border-color: rgba(0, 191, 255, 0.4);
+      border-bottom: none;
+    }
+
+    .sso-tab-content {
+      display: none;
+    }
+
+    .sso-tab-content.active {
+      display: block;
+    }
+
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 25px;
+      padding: 15px;
+      background: rgba(138, 43, 226, 0.1);
+      border-radius: 10px;
+      border: 1px solid rgba(138, 43, 226, 0.2);
+    }
+
+    .toggle-switch label {
+      color: #00bfff;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 77, 77, 0.3);
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background: linear-gradient(135deg, #50fa7b, #32cd32);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    .info-banner {
+      background: rgba(0, 191, 255, 0.1);
+      border: 1px solid rgba(0, 191, 255, 0.3);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      color: #00bfff;
+      font-size: 0.9em;
+    }
+
     @media (max-width: 768px) {
       .header {
         padding: 20px;
@@ -549,6 +678,14 @@
       .table-container {
         font-size: 0.9em;
       }
+
+      .sso-tabs {
+        flex-direction: column;
+      }
+
+      .sso-tab {
+        border-radius: 10px;
+      }
     }
   </style>
 </head>
@@ -560,6 +697,9 @@
         Admin Dashboard
       </h1>
       <div class="header-actions">
+        <button class="btn btn-primary" onclick="openSSOModal()">
+          🔐 SSO Settings
+        </button>
         <button class="btn btn-primary" onclick="openAddModal()">
           ➕ Add User
         </button>
@@ -664,6 +804,173 @@
           <button type="submit" class="btn btn-primary">💾 Save User</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- SSO Configuration Modal -->
+  <div class="modal" id="ssoModal">
+    <div class="modal-content large">
+      <div class="modal-header">
+        <h2>SSO Configuration</h2>
+        <button class="close-btn" onclick="closeSSOModal()">✕</button>
+      </div>
+
+      <!-- SSO Tabs -->
+      <div class="sso-tabs">
+        <button class="sso-tab active" onclick="switchSSOTab('jwt')">JWT</button>
+        <button class="sso-tab" onclick="switchSSOTab('saml')">SAML</button>
+        <button class="sso-tab" onclick="switchSSOTab('oauth')">OAuth</button>
+      </div>
+
+      <!-- JWT Configuration -->
+      <div class="sso-tab-content active" id="jwtContent">
+        <div class="toggle-switch">
+          <label class="switch">
+            <input type="checkbox" id="jwtEnabled">
+            <span class="slider"></span>
+          </label>
+          <label>Enable JWT Login</label>
+        </div>
+
+        <div class="info-banner">
+          ℹ️ Configure JWT settings to allow users to authenticate using JSON Web Tokens as Identity Provider (IdP).
+        </div>
+
+        <form id="jwtForm" onsubmit="saveJWTConfig(event)">
+          <div class="form-group">
+            <label>JWT Login URL *</label>
+            <input type="url" id="jwtLoginUrl" placeholder="https://example.com/idp/jwtsso/...">
+          </div>
+
+          <div class="form-group">
+            <label>JWT Issuer *</label>
+            <input type="text" id="jwtIssuer" placeholder="example.xecurify.com">
+          </div>
+
+          <div class="form-group">
+            <label>JWT Secret (HS256)</label>
+            <input type="password" id="jwtSecret" placeholder="Enter JWT secret key">
+          </div>
+
+          <div class="form-group">
+            <label>JWT Certificate (RS256)</label>
+            <textarea id="jwtCertificate" placeholder="-----BEGIN CERTIFICATE-----
+...
+-----END CERTIFICATE-----"></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="testJWTConfig()">🧪 Test JWT Login</button>
+            <button type="submit" class="btn btn-primary">💾 Save JWT Configuration</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- SAML Configuration -->
+      <div class="sso-tab-content" id="samlContent">
+        <div class="toggle-switch">
+          <label class="switch">
+            <input type="checkbox" id="samlEnabled">
+            <span class="slider"></span>
+          </label>
+          <label>Enable SAML Login</label>
+        </div>
+
+        <div class="info-banner">
+          ℹ️ Configure SAML 2.0 settings to allow users to authenticate using SAML as Identity Provider (IdP).
+        </div>
+
+        <form id="samlForm" onsubmit="saveSAMLConfig(event)">
+          <div class="form-group">
+            <label>SAML SSO URL *</label>
+            <input type="url" id="samlSsoUrl" placeholder="https://example.xecurify.com/moas/idp/samlsso/...">
+          </div>
+
+          <div class="form-group">
+            <label>IdP Entity ID *</label>
+            <input type="url" id="samlIdpEntityId" placeholder="https://login.xecurify.com/moas/idp/saml">
+          </div>
+
+          <div class="form-group">
+            <label>SP Entity ID *</label>
+            <input type="url" id="samlSpEntityId" placeholder="http://1.example.localhost:9090/sso/saml/metadata">
+          </div>
+
+          <div class="form-group">
+            <label>Assertion Consumer Service URL *</label>
+            <input type="url" id="samlAcsUrl" placeholder="http://1.example.localhost:9090/sso/saml/callback">
+          </div>
+
+          <div class="form-group">
+            <label>IdP X.509 Certificate *</label>
+            <textarea id="samlCertificate" placeholder="-----BEGIN CERTIFICATE-----
+...
+-----END CERTIFICATE-----"></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="testSAMLConfig()">🧪 Test SAML SSO</button>
+            <button type="submit" class="btn btn-primary">💾 Save SAML Configuration</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- OAuth Configuration -->
+      <div class="sso-tab-content" id="oauthContent">
+        <div class="toggle-switch">
+          <label class="switch">
+            <input type="checkbox" id="oauthEnabled">
+            <span class="slider"></span>
+          </label>
+          <label>Enable OAuth Login</label>
+        </div>
+
+        <div class="info-banner">
+          ℹ️ Configure OAuth 2.0 / OpenID Connect settings to allow users to authenticate using OAuth as Identity Provider (IdP).
+        </div>
+
+        <form id="oauthForm" onsubmit="saveOAuthConfig(event)">
+          <div class="form-group">
+            <label>Authorization URL *</label>
+            <input type="url" id="oauthAuthUrl" placeholder="https://example.xecurify.com/moas/idp/openidsso">
+          </div>
+
+          <div class="form-group">
+            <label>Token URL *</label>
+            <input type="url" id="oauthTokenUrl" placeholder="https://example.xecurify.com/moas/rest/oauth/token">
+          </div>
+
+          <div class="form-group">
+            <label>User Info URL *</label>
+            <input type="url" id="oauthUserInfoUrl" placeholder="https://example.xecurify.com/moas/rest/oauth/getuserinfo">
+          </div>
+
+          <div class="form-group">
+            <label>Client ID *</label>
+            <input type="text" id="oauthClientId" placeholder="rqEo1HbIyLFCoVZ3ktV3RpFRYcLuLVW">
+          </div>
+
+          <div class="form-group">
+            <label>Client Secret *</label>
+            <input type="password" id="oauthClientSecret" placeholder="Enter client secret">
+          </div>
+
+          <div class="form-group">
+            <label>Redirect URI *</label>
+            <input type="url" id="oauthRedirectUri" placeholder="http://1.example.localhost:9090/sso/oauth/callback">
+          </div>
+
+          <div class="form-group">
+            <label>Scopes</label>
+            <input type="text" id="oauthScopes" placeholder="openid,profile,email" value="openid,profile,email">
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="testOAuthConfig()">🧪 Test OAuth Login</button>
+            <button type="submit" class="btn btn-primary">💾 Save OAuth Configuration</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -796,14 +1103,12 @@
       try {
         let response;
         if (editingUserId) {
-          // Update existing user
           response = await fetch(`/api/users/${editingUserId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userData)
           });
         } else {
-          // Create new user
           response = await fetch('/api/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -862,6 +1167,174 @@
       setTimeout(() => {
         toast.remove();
       }, 3000);
+    }
+
+    // SSO Configuration Functions
+    function openSSOModal() {
+      document.getElementById('ssoModal').classList.add('active');
+      loadSSOConfig();
+    }
+
+    function closeSSOModal() {
+      document.getElementById('ssoModal').classList.remove('active');
+    }
+
+    function switchSSOTab(tab) {
+      // Remove active class from all tabs and contents
+      document.querySelectorAll('.sso-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.sso-tab-content').forEach(c => c.classList.remove('active'));
+      
+      // Add active class to selected tab
+      event.target.classList.add('active');
+      document.getElementById(tab + 'Content').classList.add('active');
+    }
+
+    async function loadSSOConfig() {
+      try {
+        const response = await fetch('/api/sso/config');
+        if (response.ok) {
+          const config = await response.json();
+          
+          // Load JWT config
+          if (config.jwt) {
+            document.getElementById('jwtEnabled').checked = config.jwt.enabled || false;
+            document.getElementById('jwtLoginUrl').value = config.jwt.loginUrl || '';
+            document.getElementById('jwtIssuer').value = config.jwt.issuer || '';
+            document.getElementById('jwtSecret').value = config.jwt.secret || '';
+            document.getElementById('jwtCertificate').value = config.jwt.certificate || '';
+          }
+          
+          // Load SAML config
+          if (config.saml) {
+            document.getElementById('samlEnabled').checked = config.saml.enabled || false;
+            document.getElementById('samlSsoUrl').value = config.saml.ssoUrl || '';
+            document.getElementById('samlIdpEntityId').value = config.saml.idpEntityId || '';
+            document.getElementById('samlSpEntityId').value = config.saml.spEntityId || '';
+            document.getElementById('samlAcsUrl').value = config.saml.acsUrl || '';
+            document.getElementById('samlCertificate').value = config.saml.certificate || '';
+          }
+          
+          // Load OAuth config
+          if (config.oauth) {
+            document.getElementById('oauthEnabled').checked = config.oauth.enabled || false;
+            document.getElementById('oauthAuthUrl').value = config.oauth.authUrl || '';
+            document.getElementById('oauthTokenUrl').value = config.oauth.tokenUrl || '';
+            document.getElementById('oauthUserInfoUrl').value = config.oauth.userInfoUrl || '';
+            document.getElementById('oauthClientId').value = config.oauth.clientId || '';
+            document.getElementById('oauthClientSecret').value = config.oauth.clientSecret || '';
+            document.getElementById('oauthRedirectUri').value = config.oauth.redirectUri || '';
+            document.getElementById('oauthScopes').value = config.oauth.scopes || 'openid,profile,email';
+          }
+        }
+      } catch (error) {
+        console.error('Error loading SSO config:', error);
+      }
+    }
+
+    async function saveJWTConfig(event) {
+      event.preventDefault();
+      
+      const config = {
+        enabled: document.getElementById('jwtEnabled').checked,
+        loginUrl: document.getElementById('jwtLoginUrl').value,
+        issuer: document.getElementById('jwtIssuer').value,
+        secret: document.getElementById('jwtSecret').value,
+        certificate: document.getElementById('jwtCertificate').value
+      };
+
+      try {
+        const response = await fetch('/api/sso/jwt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(config)
+        });
+
+        if (response.ok) {
+          showToast('JWT configuration saved successfully!', 'success');
+        } else {
+          showToast('Failed to save JWT configuration', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving JWT config:', error);
+        showToast('Error saving JWT configuration', 'error');
+      }
+    }
+
+    async function saveSAMLConfig(event) {
+      event.preventDefault();
+      
+      const config = {
+        enabled: document.getElementById('samlEnabled').checked,
+        ssoUrl: document.getElementById('samlSsoUrl').value,
+        idpEntityId: document.getElementById('samlIdpEntityId').value,
+        spEntityId: document.getElementById('samlSpEntityId').value,
+        acsUrl: document.getElementById('samlAcsUrl').value,
+        certificate: document.getElementById('samlCertificate').value
+      };
+
+      try {
+        const response = await fetch('/api/sso/saml', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(config)
+        });
+
+        if (response.ok) {
+          showToast('SAML configuration saved successfully!', 'success');
+        } else {
+          showToast('Failed to save SAML configuration', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving SAML config:', error);
+        showToast('Error saving SAML configuration', 'error');
+      }
+    }
+
+    async function saveOAuthConfig(event) {
+      event.preventDefault();
+      
+      const config = {
+        enabled: document.getElementById('oauthEnabled').checked,
+        authUrl: document.getElementById('oauthAuthUrl').value,
+        tokenUrl: document.getElementById('oauthTokenUrl').value,
+        userInfoUrl: document.getElementById('oauthUserInfoUrl').value,
+        clientId: document.getElementById('oauthClientId').value,
+        clientSecret: document.getElementById('oauthClientSecret').value,
+        redirectUri: document.getElementById('oauthRedirectUri').value,
+        scopes: document.getElementById('oauthScopes').value
+      };
+
+      try {
+        const response = await fetch('/api/sso/oauth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(config)
+        });
+
+        if (response.ok) {
+          showToast('OAuth configuration saved successfully!', 'success');
+        } else {
+          showToast('Failed to save OAuth configuration', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving OAuth config:', error);
+        showToast('Error saving OAuth configuration', 'error');
+      }
+    }
+
+    async function testJWTConfig() {
+      showToast('Testing JWT configuration...', 'success');
+      // Implement JWT test logic
+    }
+
+    async function testSAMLConfig() {
+      showToast('Testing SAML configuration...', 'success');
+      // Implement SAML test logic
+    }
+
+    async function testOAuthConfig() {
+      showToast('Testing OAuth configuration...', 'success');
+      // Implement OAuth test logic
     }
 
     // Initialize - load users when page loads
