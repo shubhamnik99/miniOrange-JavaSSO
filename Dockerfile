@@ -1,5 +1,5 @@
-# Use Maven with OpenJDK 17 for building
-FROM maven:3.9-eclipse-temurin-17 AS build
+# Use Maven with Java 21 for building (matching your pom.xml java.version)
+FROM maven:3.9-eclipse-temurin-21 AS build
 
 # Set working directory
 WORKDIR /app
@@ -11,24 +11,26 @@ RUN mvn dependency:go-offline -B
 # Copy source code
 COPY src ./src
 
-# Build the application
+# Build the application (creates JAR not WAR since you're using spring-boot-maven-plugin)
 RUN mvn clean package -DskipTests
 
-# Use Tomcat with JRE 17 for runtime
-FROM tomcat:10.1-jre17-temurin
+# Use OpenJDK 21 for runtime (matching your build stage)
+FROM eclipse-temurin:21-jre
 
-# Remove default Tomcat applications
-RUN rm -rf /usr/local/tomcat/webapps/*
+# Set working directory
+WORKDIR /app
 
-# Copy the WAR file from build stage
-COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
+# Copy the JAR file from build stage
+COPY --from=build /app/target/*.jar app.jar
 
-# Expose port (Render uses PORT environment variable)
+# Expose port
 EXPOSE 8080
 
-# Set environment variables for database connection
-ENV CATALINA_OPTS="-Dspring.datasource.url=${DATABASE_URL} \
-    -Dserver.port=${PORT:-8080}"
+# Set environment variables placeholder
+ENV SPRING_DATASOURCE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+ENV SPRING_DATASOURCE_USERNAME=${DB_USER}
+ENV SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+ENV SERVER_PORT=${PORT:-8080}
 
-# Start Tomcat
-CMD ["catalina.sh", "run"]
+# Run the Spring Boot application
+ENTRYPOINT ["java", "-jar", "app.jar"]
