@@ -1,0 +1,35 @@
+<<<<<<< HEAD
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\model\User.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\controller\HomeController.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\controller\DashboardController.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\dto\SAMLConfigDTO.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\model\SSOConfig.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\config\SecurityConfig.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\SpringSsoJwtDemoApplication.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\controller\AuthController.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\repo\UserRepository.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\service\SSOConfigService.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\controller\SsoController.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\config\SamlConfig.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\dto\OAuthConfigDTO.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\dto\JWTConfigDTO.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\config\AppConfig.java
+C:\Users\miniOrange\Desktop\miniOrange-JavaSSO-master\src\main\java\com\example\springssodemo\controller\SSOConfigController.java
+=======
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\dto\OAuthConfigDTO.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\SpringSsoJwtDemoApplication.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\repo\UserRepository.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\service\SSOConfigService.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\controller\DashboardController.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\controller\SsoController.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\model\User.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\config\AppConfig.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\dto\JWTConfigDTO.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\model\SSOConfig.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\controller\HomeController.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\config\SecurityConfig.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\controller\AuthController.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\dto\SAMLConfigDTO.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\controller\SSOConfigController.java
+C:\Users\miniOrange\Desktop\Done-Proj\src\main\java\com\example\springssodemo\config\SamlConfig.java
+>>>>>>> f076932f74830508fcbe1f12ad64d44dcfb1f675
