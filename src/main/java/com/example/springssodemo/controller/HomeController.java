@@ -2,11 +2,11 @@ package com.example.springssodemo.controller;
 
 import com.example.springssodemo.model.User;
 import com.example.springssodemo.repo.UserRepository;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,27 +24,28 @@ public class HomeController {
         this.userRepository = userRepository;
     }
 
-    // Handle root URL and redirect to /home
+    // Redirect root "/" to "/home" to prevent 404 on Render
     @GetMapping("/")
-    public String rootRedirect(HttpSession session, Model model) {
-        return home(session, model); // reuse home logic
+    public String rootRedirect() {
+        return "redirect:/home";
     }
 
     @GetMapping("/home")
     public String home(HttpSession session, Model model) {
         Object u = session.getAttribute("username");
+
         if (u == null) {
-            // try to obtain username from Spring Security context (covers SAML/OAuth login)
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
             if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
                 String username = null;
                 Object principal = auth.getPrincipal();
 
-                if (principal instanceof Saml2AuthenticatedPrincipal p) {
-                    if (p.getFirstAttribute("email") != null) username = p.getFirstAttribute("email");
-                    if (username == null && p.getFirstAttribute("username") != null) username = p.getFirstAttribute("username");
-                    if (username == null && p.getFirstAttribute("user") != null) username = p.getFirstAttribute("user");
-                    if (username == null) username = p.getName();
+                if (principal instanceof Saml2AuthenticatedPrincipal samlPrincipal) {
+                    username = samlPrincipal.getFirstAttribute("email");
+                    if (username == null) username = samlPrincipal.getFirstAttribute("username");
+                    if (username == null) username = samlPrincipal.getFirstAttribute("user");
+                    if (username == null) username = samlPrincipal.getName();
                 } 
                 else if (auth instanceof OAuth2AuthenticationToken oauth) {
                     Map<String, Object> attr = oauth.getPrincipal().getAttributes();
@@ -58,7 +59,6 @@ public class HomeController {
                 }
 
                 if (username != null) {
-                    // Provision user if not exists
                     Optional<User> opt = userRepository.findByUsername(username);
                     if (opt.isEmpty()) {
                         User newUser = new User(username, "<sso>", username);
@@ -72,6 +72,6 @@ public class HomeController {
 
         if (u == null) return "redirect:/login";
         model.addAttribute("username", u.toString());
-        return "home";
+        return "home"; // Thymeleaf template: home.html
     }
 }
