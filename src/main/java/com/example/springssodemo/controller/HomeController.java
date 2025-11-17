@@ -24,10 +24,10 @@ public class HomeController {
         this.userRepository = userRepository;
     }
 
-    // Root redirect to /home
+    // Root redirect - changed to /login instead of /home
     @GetMapping("/")
     public String rootRedirect() {
-        return "redirect:/home";
+        return "redirect:/login";
     }
 
     @GetMapping("/home")
