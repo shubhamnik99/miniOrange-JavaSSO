@@ -27,7 +27,7 @@ public class HomeController {
     // Redirect root "/" to "/home" to prevent 404 on Render
     @GetMapping("/")
     public String rootRedirect() {
-        return "redirect:/home";
+        return "redirect:/home.html";
     }
 
     @GetMapping("/home")
