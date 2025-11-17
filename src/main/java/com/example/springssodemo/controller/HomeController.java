@@ -24,6 +24,12 @@ public class HomeController {
         this.userRepository = userRepository;
     }
 
+    // Handle root URL and redirect to /home
+    @GetMapping("/")
+    public String rootRedirect(HttpSession session, Model model) {
+        return home(session, model); // reuse home logic
+    }
+
     @GetMapping("/home")
     public String home(HttpSession session, Model model) {
         Object u = session.getAttribute("username");
@@ -34,8 +40,7 @@ public class HomeController {
                 String username = null;
                 Object principal = auth.getPrincipal();
 
-                if (principal instanceof Saml2AuthenticatedPrincipal) {
-                    Saml2AuthenticatedPrincipal p = (Saml2AuthenticatedPrincipal) principal;
+                if (principal instanceof Saml2AuthenticatedPrincipal p) {
                     if (p.getFirstAttribute("email") != null) username = p.getFirstAttribute("email");
                     if (username == null && p.getFirstAttribute("username") != null) username = p.getFirstAttribute("username");
                     if (username == null && p.getFirstAttribute("user") != null) username = p.getFirstAttribute("user");
