@@ -1,7 +1,6 @@
-# Use Maven with Java 21 for building (matching your pom.xml java.version)
+# Build stage
 FROM maven:3.9-eclipse-temurin-21 AS build
 
-# Set working directory
 WORKDIR /app
 
 # Copy pom.xml and download dependencies
@@ -11,22 +10,21 @@ RUN mvn dependency:go-offline -B
 # Copy source code
 COPY src ./src
 
-# Build the application (creates JAR not WAR since you're using spring-boot-maven-plugin)
+# Build the application
 RUN mvn clean package -DskipTests
 
-# Use OpenJDK 21 for runtime (matching your build stage)
+# Runtime stage
 FROM eclipse-temurin:21-jre
 
-# Set working directory
 WORKDIR /app
 
-# Copy the JAR file from build stage
-COPY --from=build /app/target/*.jar app.jar
+# Copy the JAR from build stage
+COPY --from=build /app/target/spring-sso-jwt-demo-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose port
 EXPOSE 8080
 
-# Set environment variables placeholder
+# Set environment variables (Render placeholders)
 ENV SPRING_DATASOURCE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
 ENV SPRING_DATASOURCE_USERNAME=${DB_USER}
 ENV SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
