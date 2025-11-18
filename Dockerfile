@@ -24,11 +24,7 @@ COPY --from=build /app/target/spring-sso-jwt-demo-0.0.1-SNAPSHOT.jar app.jar
 # Expose port
 EXPOSE 8080
 
-# Set environment variables (Render placeholders)
-ENV SPRING_DATASOURCE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-ENV SPRING_DATASOURCE_USERNAME=${DB_USER}
-ENV SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
-ENV SERVER_PORT=${PORT:-8080}
+
 
 # Run the Spring Boot application
 ENTRYPOINT ["java", "-jar", "app.jar"]
