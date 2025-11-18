@@ -24,37 +24,36 @@ public class HomeController {
         this.userRepository = userRepository;
     }
 
-    // Root redirect - changed to /login instead of /home
-    @GetMapping("/")
-    public String rootRedirect() {
-        return "redirect:/login";
-    }
-
     @GetMapping("/home")
     public String home(HttpSession session, Model model) {
         Object u = session.getAttribute("username");
         if (u == null) {
+            // try to obtain username from Spring Security context (covers SAML/OAuth login)
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
                 String username = null;
                 Object principal = auth.getPrincipal();
 
-                if (principal instanceof Saml2AuthenticatedPrincipal p) {
+                if (principal instanceof Saml2AuthenticatedPrincipal) {
+                    Saml2AuthenticatedPrincipal p = (Saml2AuthenticatedPrincipal) principal;
                     if (p.getFirstAttribute("email") != null) username = p.getFirstAttribute("email");
-                    else if (p.getFirstAttribute("username") != null) username = p.getFirstAttribute("username");
-                    else if (p.getFirstAttribute("user") != null) username = p.getFirstAttribute("user");
-                    else username = p.getName();
-                } else if (auth instanceof OAuth2AuthenticationToken oauth) {
+                    if (username == null && p.getFirstAttribute("username") != null) username = p.getFirstAttribute("username");
+                    if (username == null && p.getFirstAttribute("user") != null) username = p.getFirstAttribute("user");
+                    if (username == null) username = p.getName();
+                } 
+                else if (auth instanceof OAuth2AuthenticationToken oauth) {
                     Map<String, Object> attr = oauth.getPrincipal().getAttributes();
                     if (attr.get("preferred_username") != null) username = attr.get("preferred_username").toString();
                     else if (attr.get("name") != null) username = attr.get("name").toString();
                     else if (attr.get("email") != null) username = attr.get("email").toString().split("@")[0];
                     else if (attr.get("sub") != null) username = attr.get("sub").toString();
-                } else {
+                } 
+                else {
                     username = auth.getName();
                 }
 
                 if (username != null) {
+                    // Provision user if not exists
                     Optional<User> opt = userRepository.findByUsername(username);
                     if (opt.isEmpty()) {
                         User newUser = new User(username, "<sso>", username);

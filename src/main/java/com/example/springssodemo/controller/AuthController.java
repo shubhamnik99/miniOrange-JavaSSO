@@ -1,4 +1,4 @@
-// ==================== AuthController.java (FIXED) ====================
+// ==================== AuthController.java (Updated) ====================
 package com.example.springssodemo.controller;
 
 import com.example.springssodemo.model.User;
@@ -30,8 +30,7 @@ public class AuthController {
     }
 
     // ------------------ LOGIN PAGE ------------------
-    // REMOVED "/" from mapping to avoid conflict with HomeController
-    @GetMapping("/login")
+    @GetMapping({"/", "/login"})
     public String loginPage(Model model) {
         // Get enabled SSO methods and pass to login page
         Map<String, Boolean> enabledSSO = ssoConfigService.getEnabledSSOMethods();
